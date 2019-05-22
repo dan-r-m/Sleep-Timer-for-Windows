@@ -3,11 +3,20 @@ import os
 
 HEIGHT = 600
 WIDTH = 600
+after = None
 BackgroundColor = "white"
 UserEntryColor = "#80C1FF"
 ClockBackgroundColor="#80C1FF"
 ClockColor = "white"
 
+def cancelCountdown():
+    global after
+    timer = False
+    clockDisplay.config(text="00:00")
+    clockDisplay.after_cancel(after)
+    #print("Countdown cancelled.")
+
+    
 def calcTime(seconds):
     minutes = int(seconds) / 60
     seconds = int(seconds) % 60
@@ -21,13 +30,14 @@ def shutdownProc():
 
 
 def updateTime(seconds):
+    global after
     if seconds==0:
         shutdownProc()
     else:
         seconds = int(seconds)-1
         clockDisplay.config(text=calcTime(seconds))
         #print(calcTime(seconds))
-        clockDisplay.after(1000, lambda: updateTime(seconds))
+        after = clockDisplay.after(1000, updateTime, seconds)
 
 
 def submitMinutes(minutes):
@@ -38,6 +48,7 @@ def submitMinutes(minutes):
 
 
 root = Tk()
+
 
 canvas = Canvas(root, height=HEIGHT, width=WIDTH)
 canvas.pack()
@@ -57,7 +68,10 @@ entry = Entry(frameUpper, bd=5)
 entry.place(anchor=N, relx=0.7, rely=0.2, relwidth=0.4, relheight=0.2)
 
 button = Button(frameUpper, text="Submit", command=lambda: submitMinutes(entry.get()))
-button.place(anchor=N, relx=0.5, rely=0.6, relwidth=0.3, relheight=0.2)
+button.place(anchor=N, relx=0.35, rely=0.6, relwidth=0.3, relheight=0.2)
+
+cancelButton = Button(frameUpper, text="Cancel", command=cancelCountdown)
+cancelButton.place(anchor=N, relx=0.7, rely=0.6, relwidth=0.3, relheight=0.2)
 
 
 #clock frame area
